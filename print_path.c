@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-extern char **environ;
+#include <print_path.h>
 
 /**
  * _getenv - gets the value of an environment variable
