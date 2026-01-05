@@ -7,7 +7,7 @@
  */
 void example1(void)
 {
-	char *argv[] = {"/bin/echo", "Hello from execve!", NULL};
+	char *argv[] = {"/bin/echo", "Welcome to Execve!", NULL};
 	char *envp[] = {"MYVAR=123", NULL};
 
 	if (execve(argv[0], argv, envp) == -1)
