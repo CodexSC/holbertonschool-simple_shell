@@ -1,14 +1,4 @@
 #include <stdio.h>
-
-int main(void)
-{
-    printf("Hello\n");
-    return 0;
-}
-
-Once you share the actual code (all 24 lines), I can create a corrected version with proper tab indentation that will pass the style checker.
-
-#include <stdio.h>
 /**
  * main - prints all arguments without using ac
  * @ac: argument count (unused)
