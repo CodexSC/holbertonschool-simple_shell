@@ -19,7 +19,7 @@ int main(void)
 		/* if CTRL+D pressed, program exits */
 		if (getline(&line, &len, stdin) == -1)
 			break;
-	
+
 		/* change the last character of 'line' (\n) by the terminator '\0' */
 		line[strcspn(line, "\n")] = '\0';
 
@@ -32,7 +32,7 @@ int main(void)
 		{
 			char *argv[] = {line, NULL};
 
-			/* launch the executable found in the specified PATH with the specified environnement */
+			/* launch file in specified PATH with the specified environnement */
 			execve(line, argv, environ);
 			perror("Error");
 			exit(1);
