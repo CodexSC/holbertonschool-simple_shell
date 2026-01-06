@@ -1,5 +1,13 @@
 #include "shell.h"
 
+/**
+ * main - entry point for the simple shell
+ * Description: Creates an infinite loop that displays a prompt, reads user
+ * commands, and executes them using fork and execve. Handles EOF (Ctrl+D)
+ * and exit command gracefully.
+ *
+ * Return: Always 0
+ */
 int main(void)
 {
 	char *line = NULL;
