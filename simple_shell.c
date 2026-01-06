@@ -13,10 +13,7 @@ int main(void)
 		fflush(stdout);
 
 		if (getline(&line, &len, stdin) == -1)
-		{
-			puts("");
 			break;
-		}
 
 		line[strcspn(line, "\n")] = '\0';
 
