@@ -17,7 +17,10 @@ int main(void)
 
 		line[strcspn(line, "\n")] = '\0';
 
-		if (strcmp(line, "exit") == 0 || *line == '\0')
+		if (strcmp(line, "exit") == 0)
+			break;
+
+		if (*line == '\0')
 			continue;
 
 		argv[0] = line;
