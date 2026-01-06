@@ -9,7 +9,10 @@
 void execute_cmd(char *line)
 {
 	pid_t pid;
-	char *argv[] = {line, NULL};
+	char *argv[2];
+
+	argv[0] = line;
+	argv[1] = NULL;
 
 	pid = fork();
 	if (pid == 0)
