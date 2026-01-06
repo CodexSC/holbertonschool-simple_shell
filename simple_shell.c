@@ -1,4 +1,6 @@
 #include "shell.h"
+#include <unistd.h>
+#include <stdio.h>
 
 /**
  * execute_cmd - executes a command using fork and execve
@@ -23,7 +25,7 @@ void execute_cmd(char *line)
 	if (pid == 0)
 	{
 		execve(line, argv, environ);
-		perror("Error");
+		perror(line);
 		exit(127);
 	}
 	else
@@ -36,7 +38,7 @@ void execute_cmd(char *line)
  * main - entry point for the simple shell
  * Description: Creates an infinite loop that displays a prompt, reads user
  * commands, and executes them using fork and execve. Handles EOF (Ctrl+D)
- * and exit command gracefully.
+ * and exit command gracefully. Only shows prompt in interactive mode.
  *
  * Return: Always 0
  */
@@ -44,10 +46,12 @@ int main(void)
 {
 	char *line = NULL;
 	size_t len = 0;
+	int is_interactive = isatty(STDIN_FILENO);
 
 	while (1)
 	{
-		printf("$ ");
+		if (is_interactive)
+			printf("($) ");
 		fflush(stdout);
 
 		if (getline(&line, &len, stdin) == -1)
