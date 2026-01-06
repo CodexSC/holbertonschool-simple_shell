@@ -11,8 +11,4 @@
 
 extern char **environ;
 
-char *read_command(void);
-void trim_newline(char *str);
-int execute_command(char *command);
-
 #endif
