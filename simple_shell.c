@@ -35,14 +35,22 @@ int main(void)
 		argv[1] = NULL;
 
 		pid = fork();
-		if (pid == 0)
+		if (pid == -1)
 		{
-			execve(line, argv, environ);
-			perror("Error");
-			exit(1);
-		}
+			perror("fork");
+			continue;
+	}
+	if (pid == 0)
+	{
+		execve(line, argv, environ);
+		perror("Error");
+		exit(127);
+	}
+	else
+	{
 		wait(NULL);
 	}
+}
 
 	free(line);
 	return (0);
