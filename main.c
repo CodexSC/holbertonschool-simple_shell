@@ -1,5 +1,10 @@
 #include "shell.h"
 
+/**
+ * main - represents the base of the simple shell
+ *
+ * Return: Always 0.
+ */
 int main(void)
 {
 	char *line = NULL;
@@ -40,7 +45,6 @@ int main(void)
 			wait(NULL);
 		}
 	}
-
 	free(line);
 	return (0);
 }
