@@ -32,6 +32,7 @@ int main(void)
 		{
 			char *argv[] = {line, NULL};
 
+			/* launch the executable found in the specified PATH with the specified environnement */
 			execve(line, argv, environ);
 			perror("Error");
 			exit(1);
