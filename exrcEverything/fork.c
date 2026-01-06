@@ -14,7 +14,7 @@ int run_command(void)
 {
 	pid_t pid;
 	int status;
-	char *argv[] = {"/bin/echo", "Hello from simple shell!", NULL};
+	char *argv[] = {"/bin/echo", "Hello from HolbertonShell - HSH!", NULL};
 
 	pid = fork();
 
