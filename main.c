@@ -13,7 +13,7 @@ int main(void)
 
 	while (1)
 	{
-		printf("$>");
+		printf("$ ");
 		fflush(stdout);
 
 		/* if CTRL+D pressed, program exits */
