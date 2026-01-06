@@ -23,6 +23,10 @@ int main(void)
 		/* change the last character of 'line' (\n) by the terminator '\0' */
 		line[strcspn(line, "\n")] = '\0';
 
+		/* if 'exit' entered', program exits */
+		if (strcmp(line, "exit") == 0)
+			break;
+
 		/* if ENTER pressed but line empty, restart loop */
 		if (*line == '\0')
 			continue;
