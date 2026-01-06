@@ -1,6 +1,32 @@
 #include "shell.h"
 
 /**
+ * execute_cmd - executes a single command using fork and execve
+ * @line: the command to execute
+ *
+ * Return: void
+ */
+void execute_cmd(char *line)
+{
+	pid_t pid;
+	char *argv[] = {line, NULL};
+
+	pid = fork();
+	if (pid == 0)
+	{
+		/* Child process: launch file with specified environment */
+		execve(line, argv, environ);
+		perror("Error");
+		exit(1);
+	}
+	else
+	{
+		/* Parent process: wait for child to finish */
+		wait(NULL);
+	}
+}
+
+/**
  * main - represents the base of the simple shell
  *
  * Return: Always 0.
@@ -9,7 +35,6 @@ int main(void)
 {
 	char *line = NULL;
 	size_t len = 0;
-	pid_t pid;
 
 	while (1)
 	{
@@ -30,21 +55,9 @@ int main(void)
 		/* if ENTER pressed but line empty, restart loop */
 		if (*line == '\0')
 			continue;
-		/* creates a child process, if a parent exists then it becomes the child */
-		pid = fork();
-		if (pid == 0)
-		{
-			char *argv[] = {line, NULL};
 
-			/* launch file in specified PATH with the specified environnement */
-			execve(line, argv, environ);
-			perror("Error");
-			exit(1);
-		}
-		else
-		{
-			wait(NULL);
-		}
+		/* execute the command */
+		execute_cmd(line);
 	}
 	free(line);
 	return (0);
