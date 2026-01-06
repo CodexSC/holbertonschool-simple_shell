@@ -1,0 +1,21 @@
+.TH SIMPLE_SHELL 1 "Jan 6 2026" "1.0" "Simple Shell Manual"
+.SH NAME
+simple_shell \- simple UNIX command line interpreter
+.SH SYNOPSIS
+simple_shell
+.SH DESCRIPTION
+simple_shell is a simple command line interpreter.
+It displays a prompt and waits for a command.
+It executes simple commands without arguments using fork and execve.
+Only full paths to executables are supported.
+.SH EXIT STATUS
+0  if shell exits normally
+1  if execve fails in child process
+.SH EXAMPLES
+$ ./simple_shell
+$ /bin/ls
+$ /bin/pwd
+$ exit
+.SH AUTHORS
+Carlos Silva
+Damien Rossi
