@@ -1,6 +1,38 @@
 #include "shell.h"
 
 /**
+ * execute_cmd - executes a command using fork and execve
+ * @line: the command to execute
+ *
+ * Return: void
+ */
+void execute_cmd(char *line)
+{
+	pid_t pid;
+	char *argv[2];
+
+	argv[0] = line;
+	argv[1] = NULL;
+
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("fork");
+		return;
+	}
+	if (pid == 0)
+	{
+		execve(line, argv, environ);
+		perror("Error");
+		exit(127);
+	}
+	else
+	{
+		wait(NULL);
+	}
+}
+
+/**
  * main - entry point for the simple shell
  * Description: Creates an infinite loop that displays a prompt, reads user
  * commands, and executes them using fork and execve. Handles EOF (Ctrl+D)
@@ -12,8 +44,6 @@ int main(void)
 {
 	char *line = NULL;
 	size_t len = 0;
-	pid_t pid;
-	char *argv[2];
 
 	while (1)
 	{
@@ -31,26 +61,8 @@ int main(void)
 		if (*line == '\0')
 			continue;
 
-		argv[0] = line;
-		argv[1] = NULL;
-
-		pid = fork();
-		if (pid == -1)
-		{
-			perror("fork");
-			continue;
+		execute_cmd(line);
 	}
-	if (pid == 0)
-	{
-		execve(line, argv, environ);
-		perror("Error");
-		exit(127);
-	}
-	else
-	{
-		wait(NULL);
-	}
-}
 
 	free(line);
 	return (0);
