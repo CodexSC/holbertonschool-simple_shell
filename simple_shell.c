@@ -11,6 +11,7 @@
 void execute_cmd(char *line)
 {
 	pid_t pid;
+	int status;
 	char *argv[2];
 
 	argv[0] = line;
@@ -30,7 +31,7 @@ void execute_cmd(char *line)
 	}
 	else
 	{
-		wait(NULL);
+		wait(&status);
 	}
 }
 
@@ -55,7 +56,11 @@ int main(void)
 		fflush(stdout);
 
 		if (getline(&line, &len, stdin) == -1)
+		{
+			if (is_interactive)
+				printf("\n");
 			break;
+		}
 
 		line[strcspn(line, "\n")] = '\0';
 
