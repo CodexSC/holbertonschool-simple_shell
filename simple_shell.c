@@ -66,6 +66,56 @@ char **split_line(char *line)
 }
 
 /**
+ * find_command - finds a command in PATH
+ * @command: command to find
+ *
+ * Return: full path to command or NULL
+ */
+char *find_command(char *command)
+{
+	char *path_env = getenv("PATH");
+	char *path_copy;
+	char *dir;
+	char full_path[1024];
+
+	if (!path_env)
+		return (NULL);
+
+	if (strchr(command, '/') != NULL)
+	{
+		if (access(command, X_OK) == 0)
+			return (command);
+		return (NULL);
+	}
+
+	path_copy = malloc(strlen(path_env) + 1);
+	if (!path_copy)
+		return (NULL);
+
+	strcpy(path_copy, path_env);
+	dir = strtok(path_copy, ":");
+
+	while (dir != NULL)
+	{
+		snprintf(full_path, sizeof(full_path), "%s/%s", dir, command);
+
+		if (access(full_path, X_OK) == 0)
+		{
+			free(path_copy);
+			char *result = malloc(strlen(full_path) + 1);
+			if (result)
+				strcpy(result, full_path);
+			return (result);
+		}
+
+		dir = strtok(NULL, ":");
+	}
+
+	free(path_copy);
+	return (NULL);
+}
+
+/**
  * execute_cmd - executes a command using fork and execve
  * @argv: argument vector
  * @argv0: program name
@@ -76,16 +126,26 @@ char **split_line(char *line)
 void execute_cmd(char **argv, char *argv0, int line_num)
 {
 	pid_t pid;
+	char *cmd_path;
+
+	cmd_path = find_command(argv[0]);
+	if (!cmd_path)
+	{
+		fprintf(stderr, "%s: %d: %s: not found\n", argv0, line_num, argv[0]);
+		return;
+	}
 
 	pid = fork();
 	if (pid == -1)
 	{
 		perror("fork");
+		if (cmd_path != argv[0])
+			free(cmd_path);
 		return;
 	}
 	if (pid == 0)
 	{
-		execve(argv[0], argv, environ);
+		execve(cmd_path, argv, environ);
 		fprintf(stderr, "%s: %d: %s: not found\n", argv0, line_num, argv[0]);
 		exit(127);
 	}
@@ -93,6 +153,9 @@ void execute_cmd(char **argv, char *argv0, int line_num)
 	{
 		wait(NULL);
 	}
+
+	if (cmd_path != argv[0])
+		free(cmd_path);
 }
 
 /**
