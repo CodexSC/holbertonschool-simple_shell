@@ -14,7 +14,7 @@ char *search_path(char *cmd)
 	char full_path[1024];
 	char *result;
 
-	path_env = getenv("PATH");
+	path_env = _getenv("PATH");
 	if (!path_env)
 		return (NULL);
 
