@@ -1,7 +1,4 @@
 #include "shell.h"
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 /**
  * split_line - splits a line into tokens
@@ -117,6 +114,23 @@ char *find_command(char *command)
 }
 
 /**
+ * handle_builtin - handles built-in commands
+ * @args: argument vector
+ *
+ * Return: 2 if exit, 0 otherwise
+ */
+int handle_builtin(char **args)
+{
+	if (!args || !args[0])
+		return (0);
+
+	if (strcmp(args[0], "exit") == 0)
+		return (2);
+
+	return (0);
+}
+
+/**
  * execute_cmd - executes a command using fork and execve
  * @argv: argument vector
  * @argv0: program name
@@ -175,6 +189,7 @@ int main(int argc, char *argv[])
 	int is_interactive = isatty(STDIN_FILENO);
 	int line_num = 1;
 	char **args;
+	int builtin_result;
 
 	(void)argc;
 
@@ -193,9 +208,6 @@ int main(int argc, char *argv[])
 
 		line[strcspn(line, "\n")] = '\0';
 
-		if (strcmp(line, "exit") == 0)
-			break;
-
 		if (*line == '\0')
 		{
 			line_num++;
@@ -204,7 +216,13 @@ int main(int argc, char *argv[])
 
 		args = split_line(line);
 		if (args && args[0])
-			execute_cmd(args, argv[0], line_num);
+		{
+			builtin_result = handle_builtin(args);
+			if (builtin_result == 2)
+				break;
+			else if (builtin_result == 0)
+				execute_cmd(args, argv[0], line_num);
+		}
 
 		if (args)
 		{
