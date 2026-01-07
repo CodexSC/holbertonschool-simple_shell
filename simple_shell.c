@@ -63,11 +63,28 @@ int main(void)
 
 		line[strcspn(line, "\n")] = '\0';
 
-		while (*line && (*line == ' ' || *line == '\t'))
-			line++;
+		int start = 0;
+		int end = strlen(line) - 1;
 
-		while (*line && (line[strlen(line) - 1] == ' ' || line[strlen(line) - 1] == '\t'))
-			line[strlen(line) - 1] = '\0';
+		while (start <= end && (line[start] == ' ' || line[start] == '\t'))
+			start++;
+
+		while (end >= start && (line[end] == ' ' || line[end] == '\t'))
+			end--;
+
+		if (start > end)
+		{
+			continue;
+		}
+
+		int i = 0;
+		while (start <= end)
+		{
+			line[i] = line[start];
+			i++;
+			start++;
+		}
+		line[i] = '\0';
 
 		if (strcmp(line, "exit") == 0)
 			break;
