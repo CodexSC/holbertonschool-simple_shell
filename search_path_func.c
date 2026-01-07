@@ -28,6 +28,11 @@ char *search_path(char *cmd)
 
 	while (dir != NULL)
 	{
+		if (*dir == '\0')
+		{
+			dir = strtok(NULL, ":");
+			continue;
+		}
 		snprintf(full_path, sizeof(full_path), "%s/%s", dir, cmd);
 		if (access(full_path, X_OK) == 0)
 		{
