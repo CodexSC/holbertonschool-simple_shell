@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
 	char *line = NULL, **args;
 	size_t len = 0;
-	int is_interactive = isatty(STDIN_FILENO), line_num = 1, i;
+	int is_interactive = isatty(STDIN_FILENO), line_num = 1, i, status = 0;
 
 	(void)argc;
 	while (1)
@@ -23,12 +23,14 @@ int main(int argc, char *argv[])
 			if (is_interactive)
 				printf("\n");
 			break;
-		} line[strcspn(line, "\n")] = '\0';
+		}
+		line[strcspn(line, "\n")] = '\0';
 		if (*line == '\0')
 		{
 			line_num++;
 			continue;
-		} args = split_line(line);
+		}
+		args = split_line(line);
 		if (args && args[0])
 		{
 			if (strcmp(args[0], "exit") == 0)
@@ -37,13 +39,15 @@ int main(int argc, char *argv[])
 					free(args[i]);
 				free(args);
 				break;
-			} execute_cmd(args, argv[0], line_num);
+			}
+			status = execute_cmd(args, argv[0], line_num);
 		}
 		for (i = 0; args && args[i]; i++)
 			free(args[i]);
 		if (args)
 			free(args);
 		line_num++;
-	} free(line);
-	return (0);
+	}
+	free(line);
+	return (status);
 }
