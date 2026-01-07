@@ -5,12 +5,10 @@
 /**
  * execute_cmd - executes a command using fork and execve
  * @line: the command to execute
- * @argv0: the program name (argv[0])
- * @line_num: the line number
  *
  * Return: void
  */
-void execute_cmd(char *line, char *argv0, int line_num)
+void execute_cmd(char *line)
 {
 	pid_t pid;
 	char *argv[2];
@@ -27,7 +25,7 @@ void execute_cmd(char *line, char *argv0, int line_num)
 	if (pid == 0)
 	{
 		execve(line, argv, environ);
-		fprintf(stderr, "%s: %d: %s: not found\n", argv0, line_num, line);
+		perror(line);
 		exit(127);
 	}
 	else
@@ -44,14 +42,11 @@ void execute_cmd(char *line, char *argv0, int line_num)
  *
  * Return: Always 0
  */
-int main(int argc, char *argv[])
+int main(void)
 {
 	char *line = NULL;
 	size_t len = 0;
 	int is_interactive = isatty(STDIN_FILENO);
-	int line_num = 1;
-
-	(void)argc;
 
 	while (1)
 	{
@@ -68,17 +63,19 @@ int main(int argc, char *argv[])
 
 		line[strcspn(line, "\n")] = '\0';
 
+		while (*line && (*line == ' ' || *line == '\t'))
+			line++;
+
+		while (*line && (line[strlen(line) - 1] == ' ' || line[strlen(line) - 1] == '\t'))
+			line[strlen(line) - 1] = '\0';
+
 		if (strcmp(line, "exit") == 0)
 			break;
 
 		if (*line == '\0')
-		{
-			line_num++;
 			continue;
-		}
 
-		execute_cmd(line, argv[0], line_num);
-		line_num++;
+		execute_cmd(line);
 	}
 
 	free(line);
