@@ -77,6 +77,7 @@ char *find_command(char *command)
 	char *path_copy;
 	char *dir;
 	char full_path[1024];
+	char *result;
 
 	if (!path_env)
 		return (NULL);
@@ -102,7 +103,7 @@ char *find_command(char *command)
 		if (access(full_path, X_OK) == 0)
 		{
 			free(path_copy);
-			char *result = malloc(strlen(full_path) + 1);
+			result = malloc(strlen(full_path) + 1);
 			if (result)
 				strcpy(result, full_path);
 			return (result);
