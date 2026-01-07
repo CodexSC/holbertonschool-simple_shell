@@ -11,4 +11,8 @@
 
 extern char **environ;
 
+char **split_line(char *line);
+char *search_path(char *cmd);
+void execute_cmd(char **argv, char *argv0, int line_num);
+
 #endif
