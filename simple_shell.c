@@ -1,32 +1,6 @@
 #include "shell.h"
 #include <unistd.h>
 #include <stdio.h>
-#include <ctype.h>
-
-/**
- * trim_whitespace - removes leading and trailing whitespace from string
- * @str: string to trim
- *
- * Return: pointer to trimmed string
- */
-char *trim_whitespace(char *str)
-{
-	char *end;
-
-	while (isspace((unsigned char)*str))
-		str++;
-
-	if (*str == '\0')
-		return (str);
-
-	end = str + strlen(str) - 1;
-	while (end > str && isspace((unsigned char)*end))
-		end--;
-
-	*(end + 1) = '\0';
-
-	return (str);
-}
 
 /**
  * execute_cmd - executes a command using fork and execve
@@ -37,7 +11,6 @@ char *trim_whitespace(char *str)
 void execute_cmd(char *line)
 {
 	pid_t pid;
-	int status;
 	char *argv[2];
 
 	argv[0] = line;
@@ -57,7 +30,7 @@ void execute_cmd(char *line)
 	}
 	else
 	{
-		wait(&status);
+		wait(NULL);
 	}
 }
 
@@ -89,8 +62,6 @@ int main(void)
 		}
 
 		line[strcspn(line, "\n")] = '\0';
-
-		line = trim_whitespace(line);
 
 		if (strcmp(line, "exit") == 0)
 			break;
