@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
 	char *line = NULL, **args;
 	size_t len = 0;
 	int is_interactive = isatty(STDIN_FILENO), line_num = 1, i, status = 0;
+	int builtin_status;
 
 	(void)argc;
 	while (1)
@@ -40,7 +41,11 @@ int main(int argc, char *argv[])
 				free(args);
 				break;
 			}
-			status = execute_cmd(args, argv[0], line_num);
+			builtin_status = handle_builtin(args, argv[0], line_num);
+			if (builtin_status != -1)
+				status = builtin_status;
+			else
+				status = execute_cmd(args, argv[0], line_num);
 		}
 		for (i = 0; args && args[i]; i++)
 			free(args[i]);
