@@ -51,7 +51,7 @@ int main(void)
 	while (1)
 	{
 		if (is_interactive)
-			printf("($) ");
+			printf("$ ");
 		fflush(stdout);
 
 		if (getline(&line, &len, stdin) == -1)
