@@ -17,36 +17,33 @@ int main(int argc, char *argv[])
 	while (1)
 	{
 		if (is_interactive)
-			printf("($) ");
-		fflush(stdout);
+			printf("($) "), fflush(stdout);
 		if (getline(&line, &len, stdin) == -1)
+		{
 			if (is_interactive)
 				printf("\n");
 			break;
-		line[strcspn(line, "\n")] = '\0';
+		} line[strcspn(line, "\n")] = '\0';
 		if (*line == '\0')
+		{
 			line_num++;
 			continue;
-		args = split_line(line);
+		} args = split_line(line);
 		if (args && args[0])
 		{
 			if (strcmp(args[0], "exit") == 0)
 			{
-				i = 0;
-				while (args[i])
-					free(args[i++]);
+				for (i = 0; args[i]; i++)
+					free(args[i]);
 				free(args);
 				break;
-			}
-			execute_cmd(args, argv[0], line_num);
+			} execute_cmd(args, argv[0], line_num);
 		}
+		for (i = 0; args && args[i]; i++)
+			free(args[i]);
 		if (args)
-		{
-			i = 0;
-			while (args[i])
-				free(args[i++]);
 			free(args);
-		} line_num++;
+		line_num++;
 	} free(line);
 	return (0);
 }
