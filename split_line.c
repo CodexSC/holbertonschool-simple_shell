@@ -8,27 +8,20 @@
  */
 char **split_line(char *line)
 {
-	int bufsize = 64;
-	int position = 0;
-	char **tokens = malloc(bufsize * sizeof(char *));
-	char *token;
-	char *copy;
+	int bufsize = 64, position = 0;
+	char **tokens = malloc(bufsize * sizeof(char *)), *token, *copy;
 
 	if (!tokens)
 	{
 		perror("malloc");
 		return (NULL);
-	}
-
-	copy = malloc(strlen(line) + 1);
+	} copy = malloc(strlen(line) + 1);
 	if (!copy)
 	{
 		perror("malloc");
 		free(tokens);
 		return (NULL);
-	}
-	strcpy(copy, line);
-
+	} strcpy(copy, line);
 	token = strtok(copy, " \t");
 	while (token != NULL)
 	{
@@ -38,10 +31,8 @@ char **split_line(char *line)
 			perror("malloc");
 			free(copy);
 			return (NULL);
-		}
-		strcpy(tokens[position], token);
+		} strcpy(tokens[position], token);
 		position++;
-
 		if (position >= bufsize)
 		{
 			bufsize += 64;
@@ -52,12 +43,8 @@ char **split_line(char *line)
 				free(copy);
 				return (NULL);
 			}
-		}
-
-		token = strtok(NULL, " \t");
-	}
-	tokens[position] = NULL;
+		} token = strtok(NULL, " \t");
+	} tokens[position] = NULL;
 	free(copy);
-
 	return (tokens);
 }
