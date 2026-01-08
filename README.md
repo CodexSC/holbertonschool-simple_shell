@@ -1,51 +1,62 @@
-```
 ╔════════════════════════════════════════════════════════════════╗
 ║                    SIMPLE SHELL (hsh)                          ║
 ║              A Unix Shell Implementation in C                  ║
 ╚════════════════════════════════════════════════════════════════╝
-```
 
 ## Overview
 
-This project implements a simple UNIX shell in C. The shell reads commands from the user, parses them, and executes them. It supports both interactive and non-interactive modes, providing a minimal but functional implementation of a Unix shell.
+This project implements a simple UNIX shell in C. The shell reads commands from standard input, parses them into tokens, and executes them using system calls. It supports both interactive and non-interactive modes and closely follows the behavior of `/bin/sh` for basic command execution and error handling.
+
+The goal of this project is to understand how a shell works internally, including process creation, environment handling, and command execution.
+
+---
 
 ## Resources
 
 ### Recommended Reading
-- Unix shell fundamentals
-- Thompson shell history
-- Ken Thompson biography
-- Shell implementation concepts
+
+* UNIX shell fundamentals
+* Thompson shell history
+* Ken Thompson biography
+* Shell implementation concepts
 
 ### Man Pages
+
 ```bash
-man sh          # Standard shell manual
-sh              # Run the shell directly
+man sh
+man execve
+man fork
+man wait
 ```
+
+---
 
 ## Learning Objectives
 
-Upon completion, you should understand:
+### Historical Context
 
-**Historical Context**
-- Who designed and implemented the original Unix operating system
-- Who wrote the first version of the UNIX shell
-- Who invented the B programming language (predecessor to C)
-- Who is Ken Thompson
+* Who designed and implemented the original UNIX operating system
+* Who wrote the first version of the UNIX shell
+* Who invented the B programming language (predecessor to C)
+* Who is Ken Thompson
 
-**Core Concepts**
-- How a shell works
-- Process identifiers (pid) and parent process identifiers (ppid)
-- Environment variable manipulation
-- Difference between functions and system calls
-- Process creation and management
+### Core Concepts
 
-**Technical Skills**
-- The three prototypes of `main`
-- How shells use PATH to locate programs
-- The `execve` system call for program execution
-- Process suspension with `waitpid`/`wait`
-- EOF (end-of-file) handling
+* How a shell works internally
+* Process identifiers (PID / PPID)
+* Environment variables and PATH resolution
+* Difference between system calls and library functions
+* Parent/child process relationship
+
+### Technical Skills
+
+* The three prototypes of `main`
+* Using PATH to locate executables
+* Executing programs with `execve`
+* Process synchronization with `wait` / `waitpid`
+* Handling EOF (Ctrl+D)
+
+---
 
 ## Compilation
 
@@ -55,151 +66,190 @@ Compile the shell using:
 gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
 ```
 
+---
+
 ## Usage
 
 ### Interactive Mode
 
 ```bash
 $ ./hsh
-($) /bin/ls
-hsh main.c shell.c
-($) /bin/pwd
-/home/user/simple_shell
+($) ls
+($) pwd
 ($) exit
-$
 ```
 
 ### Non-Interactive Mode
 
 ```bash
 $ echo "/bin/ls" | ./hsh
-hsh main.c shell.c
-
 $ cat commands.txt | ./hsh
-/bin/ls
-/bin/pwd
 ```
+
+---
+
+## Shell Execution Flow
+
+```text
+User Input
+   ↓
+getline()
+   ↓
+split_line()
+   ↓
+handle_builtin()
+   ↓ (if not builtin)
+execute_cmd()
+   ↓
+fork()
+   ↓
+execve()
+   ↓
+wait()
+```
+
+### Description
+
+1. The shell reads a full line from standard input using `getline`
+2. The line is split into tokens (command and arguments)
+3. Built-in commands are executed directly in the parent process
+4. External commands are searched in the PATH
+5. A child process is created using `fork`
+6. The command is executed using `execve`
+7. The parent process waits for the child to terminate
+
+---
+
+## Built-in Commands
+
+The following built-in commands are supported:
+
+* `env` : prints the current environment variables
+* `exit` : exits the shell
+
+Built-ins are executed without creating a new process.
+
+---
+
+## Error Handling
+
+The shell strictly follows `/bin/sh` error formatting.
+
+### Command Not Found
+
+```bash
+./hsh: 1: invalid_cmd: not found
+```
+
+* `./hsh` → shell name (`argv[0]`)
+* `1` → line number
+* `invalid_cmd` → command entered
+* Exit status: `127`
+
+### Fork Failure
+
+If `fork()` fails:
+
+* An error message is printed using `perror`
+* The shell continues running safely
+
+### Exec Failure
+
+If `execve()` fails in the child process:
+
+* An error message is printed
+* The child exits with status `127`
+
+---
+
+## Exit Status Handling
+
+* Built-in commands return their own status code
+* External commands return the child process exit status
+* The shell exits using the status of the last executed command
+
+---
+
+## Environment Handling
+
+* Environment variables are accessed using the global `environ`
+* The `PATH` variable is parsed to locate executables
+* Commands containing `/` are treated as absolute or relative paths
+
+---
+
+## Memory Management
+
+This shell is designed to avoid memory leaks:
+
+* All allocated tokens are freed after each command
+* Memory allocated during PATH search is released after execution
+* The input buffer allocated by `getline` is freed before exiting
+* No dangling pointers or double frees are present
+
+---
+
+## Signal Handling
+
+* The shell handles EOF (Ctrl+D) gracefully
+* In interactive mode, the shell exits cleanly on EOF
+* Child processes handle execution signals independently
+
+*(Advanced signal handling such as SIGINT is intentionally minimal.)*
+
+---
+
+## Limitations
+
+This shell does **not** support:
+
+* Pipes (`|`)
+* Redirections (`>`, `<`, `>>`)
+* Command chaining (`;`, `&&`, `||`)
+* Variable expansion (`$VAR`)
+* Aliases or job control
+
+These features are intentionally excluded to keep the implementation simple and focused.
+
+---
 
 ## Requirements
 
 ### General
-- **Editors**: vi, vim, emacs
-- **Compiler**: gcc (Ubuntu 20.04 LTS)
-- **Flags**: `-Wall -Werror -Wextra -pedantic -std=gnu89`
-- **Styling**: Betty style guide compliance
-- **Memory**: No memory leaks allowed
-- **Functions per file**: Maximum 5
-- **Header guards**: Required for all header files
+
+* Editors: vi, vim, emacs
+* Compiler: gcc (Ubuntu 20.04 LTS)
+* Flags: `-Wall -Werror -Wextra -pedantic -std=gnu89`
+* Betty style guide compliance
+* No memory leaks allowed
+* Maximum 5 functions per file
 
 ### Code Standards
-- All files must end with a newline
-- README.md is mandatory at project root
-- Use system calls only when necessary
-- Output must match `/bin/sh` behavior exactly
+
+* All files end with a newline
+* Header files are include-guarded
+* Only allowed functions are used
+* Output matches `/bin/sh` behavior
+
+---
 
 ## Allowed Functions & System Calls
 
 ```
-String Functions:          Process Management:
-├── strlen()              ├── fork()
-├── strcpy()              ├── execve()
-├── strcat()              ├── exit() / _exit()
-├── strtok()              ├── wait() / waitpid()
-└── ...all from string.h  └── wait3() / wait4()
-
-File Operations:           Memory Management:
-├── open()                ├── malloc()
-├── close()               └── free()
-├── read()
-├── write()               I/O Functions:
-├── access()              ├── printf()
-└── stat()                ├── fprintf()
-                          └── getline()
-
-Directory Operations:      Other:
-├── opendir()             ├── getpid()
-├── readdir()             ├── chdir()
-├── closedir()            ├── isatty()
-└── getcwd()              └── signal()
+strlen   strcpy   strtok   fork   execve   wait   exit
+malloc   free     access   open   read     write
+isatty   stat     getenv   getline
 ```
-
-## Error Handling
-
-Error output must match `/bin/sh` format:
-
-```bash
-$ echo "invalid_cmd" | ./hsh
-./hsh: 1: invalid_cmd: not found
-```
-
-The program name in errors reflects `argv[0]`:
-```bash
-$ echo "test" | ./././hsh
-./././hsh: 1: test: not found
-```
-
-## Project Structure
-
-```
-.
-├── hsh              # Compiled shell executable
-├── main.c           # Entry point
-├── shell.c          # Core shell implementation
-├── helpers.c        # Utility functions
-├── builtins.c       # Built-in command handlers
-└── README.md        # This file
-```
-
-## Features Implemented
-
-- [x] Interactive prompt and command execution
-- [x] Non-interactive mode (piped input)
-- [x] PATH-based command lookup
-- [x] Process forking and execution
-- [x] Error handling and reporting
-- [x] Environment variable support
-- [x] Memory management
-- [x] Signal handling
-
-## Testing
-
-The shell should pass all test cases in both modes:
-
-```bash
-# Interactive testing
-$ ./hsh
-($) ls -la
-($) pwd
-($) exit
-
-# Non-interactive testing
-$ echo "ls -la" | ./hsh
-$ cat test_file | ./hsh
-```
-
-## Betty Style Compliance
-
-Code is checked with:
-```bash
-betty-style.pl *.c *.h
-betty-doc.pl *.c *.h
-```
-
-## Notes
-
-- This implementation prioritizes correctness and code quality
-- Each file contains no more than 5 functions
-- All header files are include-guarded
-- System calls are used only when necessary
-- The checker will verify compliance with all requirements
 
 ---
-AUTHORS:
+
+## Authors
+
 C. Silva & D. Rossi
 
 ```
 ╔══════════════════════════════════════════════════════╗
 ║  "The Unix philosophy: Do one thing and do it well"  ║
-║                   -  Ken Thompson                    ║
+║                   - Ken Thompson                    ║
 ╚══════════════════════════════════════════════════════╝
 ```
