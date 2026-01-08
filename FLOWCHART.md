@@ -104,8 +104,8 @@ When a command is NOT a built-in, this function handles execution:
 [Full Path]      [search_path()]
    │                   │
    │              ┌────┴──────┐
-   │              │            │
-   └──────────────┼────────────┘
+   │              │           │
+   └──────────────┼───────────┘
                   │
                   ▼
         ┌──────────────────────┐
@@ -139,12 +139,12 @@ When a command is NOT a built-in, this function handles execution:
     │               │        │
     ▼               ▼        │
 [CHILD]      [PARENT]        │
- PID=0        wait()          │
+ PID=0        wait()         │
     │           │            │
     │     ┌─────┴──────┐     │
     │     │            │     │
     ▼     │            │     │
- execve() │     [Exit Status] │
+ execve() │     [Exit Status]| 
  (or      │            │     │
   error)  ▼            │     │
     │   Return         │     │
