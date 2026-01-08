@@ -1,21 +1,155 @@
-.TH SIMPLE_SHELL 1 "Jan 6 2026" "1.0" "Simple Shell Manual"
+.TH HSH 1 "January 6, 2026" "1.0" "Simple Shell Manual"
 .SH NAME
-simple_shell \- simple UNIX command line interpreter
+hsh \- a simple UNIX command line interpreter
 .SH SYNOPSIS
-simple_shell
+.B hsh
 .SH DESCRIPTION
-simple_shell is a simple command line interpreter.
-It displays a prompt and waits for a command.
-It executes simple commands without arguments using fork and execve.
-Only full paths to executables are supported.
+.B hsh
+is a simple UNIX command line interpreter written in C.
+It reads commands from standard input, parses them into tokens,
+and executes them using system calls.
+
+The shell supports both interactive and non-interactive modes.
+In interactive mode, it displays a prompt and waits for user input.
+In non-interactive mode, it reads commands from standard input until EOF.
+
+The shell executes external commands by creating a child process
+using \fBfork\fP and replacing it with the requested program using
+\fBexecve\fP.
+
+Command lookup is performed using the \fBPATH\fP environment variable,
+unless the command contains a slash (/), in which case it is treated
+as an absolute or relative path.
+
+.SH MODES
+.SS Interactive Mode
+When standard input is connected to a terminal, the shell runs in
+interactive mode and displays a prompt:
+
+.RS
+($)
+.RE
+
+The shell waits for user input and executes commands until the
+\fBexit\fP built-in command is entered or EOF is encountered.
+
+.SS Non-Interactive Mode
+When standard input is not a terminal, the shell reads commands
+from standard input without displaying a prompt.
+
+Example:
+.RS
+echo "/bin/ls" | ./hsh
+.RE
+
+.SH BUILT-IN COMMANDS
+The following built-in commands are supported:
+
+.TP
+.B env
+Prints the current environment variables, one per line.
+
+.TP
+.B exit
+Exits the shell.
+
+Built-in commands are executed directly in the parent process
+without creating a new child process.
+
+.SH COMMAND EXECUTION
+For external commands, the shell performs the following steps:
+
+.RS
+1. Parses the command into tokens
+.br
+2. Searches the command in the PATH environment variable
+.br
+3. Creates a child process using fork()
+.br
+4. Executes the command using execve()
+.br
+5. Waits for the child process to terminate
+.RE
+
+.SH ERROR HANDLING
+The shell prints error messages that closely follow the format
+used by \fB/bin/sh\fP.
+
+If a command is not found, the shell prints:
+
+.RS
+hsh: <line_number>: <command>: not found
+.RE
+
+If \fBfork\fP fails, an error message is printed using \fBperror\fP.
+
+If \fBexecve\fP fails in the child process, an error message is printed
+and the child exits with status 127.
+
 .SH EXIT STATUS
-0  if shell exits normally
-1  if execve fails in child process
+The shell returns the exit status of the last executed command.
+
+.TP
+.B 0
+Shell exited normally.
+
+.TP
+.B 127
+Command not found or execution failed.
+
+Other exit codes may be returned depending on the executed command.
+
+.SH ENVIRONMENT
+The shell uses the following environment variables:
+
+.TP
+.B PATH
+A colon-separated list of directories used to locate executables.
+
+Environment variables are accessed using the global \fBenviron\fP variable.
+
+.SH SIGNALS
+The shell handles end-of-file (EOF) conditions gracefully.
+In interactive mode, receiving EOF (Ctrl+D) causes the shell to exit cleanly.
+
+Advanced signal handling (such as SIGINT) is minimal and delegated to
+child processes.
+
+.SH LIMITATIONS
+This shell does not support:
+
+.RS
+- Pipes
+.br
+- Redirections
+.br
+- Command chaining
+.br
+- Variable expansion
+.br
+- Job control
+.RE
+
 .SH EXAMPLES
-$ ./simple_shell
-$ /bin/ls
-$ /bin/pwd
-$ exit
+Run the shell interactively:
+.RS
+./hsh
+.RE
+
+Execute a command:
+.RS
+($) /bin/ls
+.RE
+
+Non-interactive usage:
+.RS
+echo "/bin/pwd" | ./hsh
+.RE
+
 .SH AUTHORS
 Carlos Silva
+.br
 Damien Rossi
+
+.SH SEE ALSO
+sh(1), bash(1), execve(2), fork(2), wait(2)
