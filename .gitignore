@@ -2,3 +2,6 @@ hsh
 test_shell_0.3.sh
 test_edge_cases.sh
 mycommand
+FLOWCHART.mmd
+FLOWCHART.md
+.gitignore
